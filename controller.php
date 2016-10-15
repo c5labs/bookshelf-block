@@ -7,6 +7,7 @@
  */
 namespace Concrete\Package\BookshelfBlock;
 
+use Exception;
 use Concrete\Core\Block\BlockType\BlockType;
 use Core;
 use Concrete\Core\Foundation\Service\ProviderList;
@@ -156,7 +157,7 @@ class Controller extends Package
     public function uninstall()
     {
         if (file_exists(DIR_BASE.'/application/files/cache/bookshelf')) {
-            $fs = \Core::make(\Illuminate\Filesystem\Filesystem::class);
+            $fs = Core::make(\Illuminate\Filesystem\Filesystem::class);
             $fs->deleteDirectory(DIR_BASE.'/application/files/cache/bookshelf');
         }
 

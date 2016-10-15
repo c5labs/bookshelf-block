@@ -7,6 +7,7 @@
  */
 namespace Concrete\Package\BookshelfBlock\Block\Bookshelf;
 
+use Exception;
 use Core;
 use FileSet;
 use Concrete\Core\Block\BlockController;
@@ -222,7 +223,7 @@ class Controller extends BlockController
             if (is_writable(DIR_BASE.'/application/files/cache/')) {
                 mkdir($cache_path);
             } else {
-                throw new \Exception(sprintf('Could not create cache path [%s].', $cache_path));
+                throw new Exception(sprintf('Could not create cache path [%s].', $cache_path));
             }
         }
 
@@ -231,7 +232,7 @@ class Controller extends BlockController
             if (is_writable($cache_path)) {
                 file_put_contents($cache_path.'/'.$cache_file_name, (string) $this->generateFileCover($file));
             } else {
-                throw new \Exception(t(sprintf('Could not create cover cache, path is not writable [%s]', $cache_path.'/'.$cache_file_name)));
+                throw new Exception(t(sprintf('Could not create cover cache, path is not writable [%s]', $cache_path.'/'.$cache_file_name)));
             }
         }
         
