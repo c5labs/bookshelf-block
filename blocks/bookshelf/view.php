@@ -16,11 +16,13 @@ defined('C5_EXECUTE') or die('Access Denied.');
     <?php if (extension_loaded('imagick')): ?>
         <?php foreach ($files as $row): ?>
             <div class="row">
-            <?php foreach ($row as $file): ?>
-                <div class="col-sm-<?php echo 12 / count($row); ?>">
-                <a href="<?php echo $file['version']->getDownloadURL(); ?>" class="bookshelf-item">
-                    <img src="<?php echo $file['cover']; ?>">
-                </a>
+            <?php foreach (array_pad($row, $numPerRow, null) as $file): ?>
+                <div class="col-sm-<?php echo (12 / $numPerRow); ?>">
+                <?php if ($file): ?>
+                    <a href="<?php echo $file['version']->getDownloadURL(); ?>" class="bookshelf-item">
+                        <img src="<?php echo $file['cover']; ?>">
+                    </a>
+                <?php endif; ?>
                 </div>
             <?php endforeach; ?>
             </div>

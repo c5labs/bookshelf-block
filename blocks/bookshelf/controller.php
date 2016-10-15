@@ -65,53 +65,6 @@ class Controller extends BlockController
     protected $btTable = 'btBookshelf';
 
     /**
-     * Is this an internal block type?
-     * If set to true the block will not be shown in the 'add block' flyout panel?
-     *
-     * @var bool
-     */
-    protected $btIsInternal = false;
-
-    /**
-     * Does the block support inline addition?
-     *
-     * @var bool
-     */
-    protected $btSupportsInlineAdd = false;
-
-    /**
-     * Does the block support inline editing?
-     *
-     * @var bool
-     */
-    protected $btSupportsInlineEdit = false;
-
-    /**
-     *  If true, container classes will not be wrapped around this block type in
-     *  edit mode (if the theme in question supports a grid framework).
-     *
-     * @var bool
-     */
-    protected $btIgnorePageThemeGridFrameworkContainer = false;
-
-    /**
-     * Prevents the block from being aliased when duplicating a page or creating
-     * a page from defaults, if true the block will be duplicated instead.
-     *
-     * @var bool
-     */
-    protected $btCopyWhenPropagate = false;
-
-    /**
-     * Returns whether this block type is included in all versions. Default is
-     * false - block types are typically versioned but sometimes it makes
-     * sense not to do so.
-     *
-     * @return bool
-     */
-    protected $btIncludeAll = false;
-
-    /**
      * The blocks form width.
      *
      * @var string
@@ -148,7 +101,7 @@ class Controller extends BlockController
      *
      * @var bool
      */
-    protected $btCacheBlockOutput = false;
+    protected $btCacheBlockOutput = true;
 
     /**
      * When block caching is enabled and output caching is enabled for a block,
@@ -177,58 +130,21 @@ class Controller extends BlockController
     protected $btCacheBlockOutputForRegisteredUsers = false;
 
     /**
-     * When this block is exported, any database columns found in this array will
-     * automatically be swapped for links to specific pages. Upon import they will
-     * map to the specific page found at that path, regardless of its ID.
-     *
-     * @var array
+     * Gets a list of the systems public file sets 
+     * and returns the name & ID.
+     * 
+     * @return array
      */
-    protected $btExportPageColumns = [];
-
-    /**
-     * When this block is exported, any database columns found in this array will
-     * automatically be swapped for links to specific files, by file name. Upon
-     * import they will map to the specific file with that filename, regardless
-     * of its file ID.
-     *
-     * @var array
-     */
-    protected $btExportFileColumns = [];
-
-    /**
-     * When this block is exported, any database columns found in this array will
-     * automatically be swapped for references to a particular page type. Upon import
-     * they will map to that specific page type ID based on the handle specified.
-     *
-     * @var array
-     */
-    protected $btExportPageTypeColumns = [];
-
-    /**
-     * When this block is exported, any database columns found in this array will
-     * automatically be swapped for a reference to a specific RSS feed object. Upon
-     * import they will map to the specific feed, regardless of its ID in the database.
-     *
-     * @var array
-     */
-    protected $btExportPageFeedColumns = [];
-
-    /**
-     * Wraps the block view in a container element with the class specified here.
-     *
-     * @var string
-     */
-    protected $btWrapperClass = '';
-
     public function getPublicFileSets()
     {
+        // Get all of the sets.
         $fsl = new \Concrete\Core\File\Set\SetList();
         $fsl->filterByType(FileSet::TYPE_PUBLIC);
         $sets = $fsl->get();
 
+        // Convert them into id => name format.
         $sets_array = array();
         if (count($sets) > 0) {
-            $sets_array = array();
             foreach ($sets as $set) {
                 $sets_array[$set->getFileSetID()] = $set->getFileSetName();
             }
@@ -236,13 +152,22 @@ class Controller extends BlockController
         return $sets_array;
     }
 
+    /**
+     * Gets the blocks configured file set IDs.
+     * 
+     * @return array
+     */
     public function getSelectedFileSetIDs()
     {
         $ids = json_decode($this->fsID, true);
-
         return is_array($ids) ? $ids : [];
     }
 
+    /**
+     * Gets the files within the currently selected filesets.
+     * 
+     * @return array
+     */
     protected function getFileSetFiles()
     {
         $files = [];
@@ -254,9 +179,16 @@ class Controller extends BlockController
         return $files;
     }
 
+    /**
+     * Generates the cover / thumbnail for a PDF file version.
+     * 
+     * @param  Version $file
+     * @return Imagick
+     */
     protected function generateFileCover($file)
     {
         $base = realpath(DIR_BASE.'/../');
+
         $im = new \Imagick();
         $im->setResolution(300, 300);
         $im->readImage($base.$file->getRelativePath().'[0]');
@@ -268,15 +200,24 @@ class Controller extends BlockController
         $im->setImageCompression(\Imagick::COMPRESSION_JPEG);
         $im->setImageCompressionQuality(70);
         $im = $im->flattenImages();
+
         return $im;
     }
 
+    /**
+     * Gets the cover / thumbnail path for a given file version.
+     * 
+     * @param  File $file
+     * @return string
+     */
     protected function getFileCover($file)
     {
+        // Setup the paths.
         $cache_path = DIR_BASE.'/application/files/cache/bookshelf';
         $relative_cache_path = DIR_REL.'/application/files/cache/bookshelf';
         $cache_file_name = $file->getFileID().'-'.$file->getFileVersionID().'.jpg';
 
+        // Create the base cache path if neeed.
         if (! is_dir($cache_path)) {
             if (is_writable(DIR_BASE.'/application/files/cache/')) {
                 mkdir($cache_path);
@@ -285,6 +226,7 @@ class Controller extends BlockController
             }
         }
 
+        // If there is no cache for the request file version, create ite.
         if (! file_exists($cache_path.'/'.$cache_file_name)) {
             if (is_writable($cache_path)) {
                 file_put_contents($cache_path.'/'.$cache_file_name, (string) $this->generateFileCover($file));
@@ -296,12 +238,19 @@ class Controller extends BlockController
         return $relative_cache_path.'/'.$cache_file_name;
     }
 
+    /**
+     * Gets the cover / thumbnail image & their associated file 
+     * versions for the configured file sets files.
+     * 
+     * @return array
+     */
     public function getFiles()
     {
         $files = $this->getFileSetFiles();
         $covers = [];
 
         foreach ($files as $file) {
+            // We only support PDFs at the moment, skip everything else.
             if ('application/pdf' === $file->getMimetype()) {
                 $covers[] = [
                     'cover' => $this->getFileCover($file),
@@ -310,6 +259,7 @@ class Controller extends BlockController
             }
         }
 
+        // We chunk the results into rows.
         return array_chunk($covers, $this->numPerRow);
     }
 
