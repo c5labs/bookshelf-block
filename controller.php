@@ -1,11 +1,11 @@
 <?php
 /**
- * Bookshelf Package Controller File.
+ * File Covers Package Controller File.
  *
  * @author   Oliver Green <oliver@c5dev.com>
  * @license  See attached license file
  */
-namespace Concrete\Package\BookshelfBlock;
+namespace Concrete\Package\FileCoversBlock;
 
 use Exception;
 use Concrete\Core\Block\BlockType\BlockType;
@@ -81,7 +81,7 @@ class Controller extends Package
      * 
      * @var string
      */
-    protected $pkgHandle = 'bookshelf-block';
+    protected $pkgHandle = 'file-covers-block';
 
     /**
      * The packages version.
@@ -95,7 +95,7 @@ class Controller extends Package
      * 
      * @var string
      */
-    protected $pkgName = 'Bookshelf Package';
+    protected $pkgName = 'File Covers Block';
 
     /**
      * The packages description.
@@ -128,7 +128,7 @@ class Controller extends Package
 
         $pkg = parent::install();
 
-        $theme = BlockType::installBlockType('bookshelf', $pkg);
+        $theme = BlockType::installBlockType('file_covers', $pkg);
 
         // Add your custom logic here that needs to be executed AFTER package install.
 
@@ -156,9 +156,9 @@ class Controller extends Package
      */
     public function uninstall()
     {
-        if (file_exists(DIR_BASE.'/application/files/cache/bookshelf')) {
+        if (file_exists(DIR_BASE.'/application/files/cache/file_covers')) {
             $fs = Core::make(\Illuminate\Filesystem\Filesystem::class);
-            $fs->deleteDirectory(DIR_BASE.'/application/files/cache/bookshelf');
+            $fs->deleteDirectory(DIR_BASE.'/application/files/cache/file_covers');
         }
 
         parent::uninstall();

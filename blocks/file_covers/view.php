@@ -19,8 +19,11 @@ defined('C5_EXECUTE') or die('Access Denied.');
             <?php foreach (array_pad($row, $numPerRow, null) as $file): ?>
                 <div class="col-sm-<?php echo (12 / $numPerRow); ?>">
                 <?php if ($file): ?>
-                    <a href="<?php echo $file['version']->getDownloadURL(); ?>" class="bookshelf-item">
-                        <img src="<?php echo $file['cover']; ?>">
+                    <a href="<?php echo $file['version']->getDownloadURL(); ?>" class="bookshelf-item-wrapper">
+                        <figure class="bookshelf-item">
+                            <img src="<?php echo $file['cover']; ?>">
+                        </figure>
+                        <?php if ($showTitles) { ?><span class="bookshelf-item-title"><?php echo $file['version']->getFileName(); ?></span><?php } ?>
                     </a>
                 <?php endif; ?>
                 </div>

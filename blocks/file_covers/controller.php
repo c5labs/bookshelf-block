@@ -1,11 +1,11 @@
 <?php
 /**
- * Bookshelf Controller File.
+ * FileCovers Controller File.
  *
  * @author   Oliver Green <oliver@c5dev.com>
  * @license  See attached license file
  */
-namespace Concrete\Package\BookshelfBlock\Block\Bookshelf;
+namespace Concrete\Package\FileCoversBlock\Block\FileCovers;
 
 use Exception;
 use Core;
@@ -29,7 +29,7 @@ class Controller extends BlockController
      *
      * @var string
      */
-    protected $btName = 'Bookshelf';
+    protected $btName = 'File Covers';
 
     /**
      * The block types description.
@@ -43,7 +43,7 @@ class Controller extends BlockController
      *
      * @var string
      */
-    protected $btHandle = 'bookshelf';
+    protected $btHandle = 'file_covers';
 
     /**
      * The block types default set within the 'add block' fly out panel.
@@ -63,7 +63,7 @@ class Controller extends BlockController
      *
      * @var string
      */
-    protected $btTable = 'btBookshelf';
+    protected $btTable = 'btFileCovers';
 
     /**
      * The blocks form width.
@@ -214,8 +214,8 @@ class Controller extends BlockController
     protected function getFileCover($file)
     {
         // Setup the paths.
-        $cache_path = DIR_BASE.'/application/files/cache/bookshelf';
-        $relative_cache_path = DIR_REL.'/application/files/cache/bookshelf';
+        $cache_path = DIR_BASE.'/application/files/cache/file_covers';
+        $relative_cache_path = DIR_REL.'/application/files/cache/file_covers';
         $cache_file_name = $file->getFileID().'-'.$file->getFileVersionID().'.jpg';
 
         // Create the base cache path if neeed.
@@ -347,6 +347,7 @@ class Controller extends BlockController
     {
         $data['fsID'] = json_encode($data['selected_file_set_ids']);
         $data['numPerRow'] = (0 === intval($data['numPerRow']) ? 2 : intval($data['numPerRow']));
+        $data['showTitles'] = (! isset($data['showTitles']) ? false : true);
 
         parent::save($data);
     }

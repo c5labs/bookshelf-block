@@ -28,9 +28,15 @@ defined('C5_EXECUTE') or die('Access Denied.');
         </script>
     </div>
 
-    <div class="form-group" id="fileSets">
+    <div class="form-group">
         <?php echo $form->label('numPerRow', t('Number per row')); ?>
         <?php echo $form->text('numPerRow', $this->controller->numPerRow, 'form-control'); ?>
+    </div>
+
+    <div class="checkbox">
+        <label>
+        <?php echo $form->checkbox('showTitles', 1, $this->controller->showTitles, 'form-control'); ?> <?php echo t('Show Titles'); ?>
+        </label>
     </div>
 
 </div>

@@ -14,15 +14,29 @@
     transition: transform .5s;
 }
 
-.bookshelf-item:hover {
+.bookshelf-item-wrapper:hover .bookshelf-item {
     transform: scale(1.1);
+}
+
+.bookshelf-block .bookshelf-item-title {
+    display: block;
+    word-wrap: break-word;
+    margin-top: 10px;
+    text-align: center;
+    margin-bottom: 10px;
+    transition: margin .5s;
+}
+
+.bookshelf-item-wrapper:hover .bookshelf-item-title {
+    margin-top: 20px;
+    margin-bottom: 0;
 }
 
 .bookshelf-block.no-results {
     background: #eee;
 }
 
-.bookshelf-block span {
+.bookshelf-block.no-results span {
     display: block;
     position: absolute;
     top: 50%; left: 50%;
