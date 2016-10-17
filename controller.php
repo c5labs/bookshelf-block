@@ -2,7 +2,7 @@
 /**
  * File Covers Package Controller File.
  *
- * @author   Oliver Green <oliver@c5dev.com>
+ * @author   Oliver Green <oliver@c5labs.com>
  * @license  See attached license file
  */
 namespace Concrete\Package\FileCoversBlock;
@@ -21,7 +21,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
  *
  * Show sets of files using thumbnails.
  *
- * @author   Oliver Green <oliver@c5dev.com>
+ * @author   Oliver Green <oliver@c5labs.com>
  * @license  See attached license file
  */
 class Controller extends Package

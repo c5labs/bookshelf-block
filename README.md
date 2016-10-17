@@ -11,7 +11,7 @@ A block that shows PDF files within a set in a thumbnail based grid format.
 6. Goto a page and add the block, it may take a few seconds to load the first time as the thumbnail cache is built on the fly.
 
 ## Support
-Developers should open an issue here, for all other support please file a support ticket [here](https://c5dev.com/support?addon=Twitter+Feed).
+Developers should open an issue here, for all other support please file a support ticket [here](https://c5labs.com/support?addon=Twitter+Feed).
 
 ## Change Log
 [Click here](https://github.com/c5labs/bookshelf-block/releases) to see the release information on GitHub for an accurate change log.

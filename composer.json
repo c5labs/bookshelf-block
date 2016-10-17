@@ -1,12 +1,12 @@
 {
-    "name": "c5dev/bookshelf_package",
+    "name": "c5labs/bookshelf_package",
     "description": "Show sets of files using thumbnails.",
     "type": "concrete5-package",
     "license": "MIT",
     "authors": [
         {
             "name": "Oliver Green",
-            "email": "oliver@c5dev.com"
+            "email": "oliver@c5labs.com"
         }
     ],
     "minimum-stability": "dev",
