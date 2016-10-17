@@ -20,10 +20,11 @@ defined('C5_EXECUTE') or die('Access Denied.');
                 <div class="col-sm-<?php echo (12 / $numPerRow); ?>">
                 <?php if ($file): ?>
                     <a href="<?php echo $file['version']->getDownloadURL(); ?>" class="bookshelf-item-wrapper">
-                        <figure class="bookshelf-item">
+                        <figure class="bookshelf-item <?php echo ($file['cover_exists'] ? '' : 'no-cover'); ?>">
                             <img src="<?php echo $file['cover']; ?>">
+                            <div class="no-cover-image">No cover image</div>
                         </figure>
-                        <?php if ($showTitles) { ?><span class="bookshelf-item-title"><?php echo $file['version']->getFileName(); ?></span><?php } ?>
+                        <?php if ($showTitles) { ?><span class="bookshelf-item-title"><?php echo $file['version']->getTitle(); ?></span><?php } ?>
                     </a>
                 <?php endif; ?>
                 </div>

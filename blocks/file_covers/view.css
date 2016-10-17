@@ -7,11 +7,36 @@
     border-radius: 3px;
 }
 
+.bookshelf-item-wrapper {
+    margin-bottom: 20px;
+    display: block;
+}
+
+.bookshelf-item-wrapper:hover {
+    text-decoration: none !important;
+}
+
 .bookshelf-item {
     display: block;
     border: 1px solid #f8f8f8;
     box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
     transition: transform .5s;
+}
+
+.bookshelf-item.no-cover img {
+    display: none;
+}
+
+.bookshelf-item .no-cover-image {
+    display: none;
+}
+
+.bookshelf-item.no-cover .no-cover-image {
+    display: block;
+    padding-top: 63.738637%;
+    padding-bottom: 63.738637%;
+    text-align: center;
+    color: #ccc;
 }
 
 .bookshelf-item-wrapper:hover .bookshelf-item {

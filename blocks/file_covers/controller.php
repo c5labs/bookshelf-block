@@ -188,21 +188,39 @@ class Controller extends BlockController
      */
     protected function generateFileCover($file)
     {
-        $base = realpath(DIR_BASE.'/../');
+        $fr = $file->getFileResource();
 
+        // Load the file resource.
         $im = new \Imagick();
         $im->setResolution(300, 300);
-        $im->readImage($base.$file->getRelativePath().'[0]');
-        $im->setBackgroundColor(new \ImagickPixel('white'));
-        $im->setImageBackgroundColor(new \ImagickPixel('white'));
-        $im->setColorspace(\Imagick::COLORSPACE_SRGB);
-        $im->setImageFormat('jpg');
-        $im->scaleImage(400,0);
-        $im->setImageCompression(\Imagick::COMPRESSION_JPEG);
-        $im->setImageCompressionQuality(70);
-        $im = $im->flattenImages();
+        $im->readImageBlob($fr->read());
+        $im->setIteratorIndex(0);
+        $im->setImageIndex(0);
 
-        return $im;
+        // Get the first page.
+        $page = $im->getImage();
+        $im->destroy();
+
+        // Set the background colors to white.
+        $page->setBackgroundColor(new \ImagickPixel('white'));
+        $page->setImageBackgroundColor(new \ImagickPixel('white'));
+        $page->setColorspace(\Imagick::COLORSPACE_SRGB);
+
+        // Flatten the page to apply the background color.
+        $flat_page = $page->flattenImages();
+        $page->destroy();
+
+        // Convert the image to JPEG.
+        $flat_page->setImageFormat('jpg');
+        $flat_page->scaleImage(400,0);
+        $flat_page->setImageCompression(\Imagick::COMPRESSION_JPEG);
+        $flat_page->setImageCompressionQuality(70);
+
+        // Export it to string.
+        $image = $flat_page->getImageBlob();
+        $flat_page->destroy();
+
+        return $image;
     }
 
     /**
@@ -214,9 +232,9 @@ class Controller extends BlockController
     protected function getFileCover($file)
     {
         // Setup the paths.
-        $cache_path = DIR_BASE.'/application/files/cache/file_covers';
-        $relative_cache_path = DIR_REL.'/application/files/cache/file_covers';
-        $cache_file_name = $file->getFileID().'-'.$file->getFileVersionID().'.jpg';
+        $cache_file_name = $this->getCacheFileName($file);
+        $cache_path = $this->getCachePath();
+        $relative_cache_path = $this->getRelativeCachePath();
 
         // Create the base cache path if neeed.
         if (! is_dir($cache_path)) {
@@ -229,14 +247,43 @@ class Controller extends BlockController
 
         // If there is no cache for the request file version, create ite.
         if (! file_exists($cache_path.'/'.$cache_file_name)) {
-            if (is_writable($cache_path)) {
-                file_put_contents($cache_path.'/'.$cache_file_name, (string) $this->generateFileCover($file));
-            } else {
+            if (! is_writable($cache_path)) {
                 throw new Exception(t(sprintf('Could not create cover cache, path is not writable [%s]', $cache_path.'/'.$cache_file_name)));
             }
         }
         
-        return $relative_cache_path.'/'.$cache_file_name;
+        return [
+            'relative_path' => $relative_cache_path.'/'.$cache_file_name,
+            'path' => $cache_path.'/'.$cache_file_name,
+            'cache_exists' => file_exists($cache_path.'/'.$cache_file_name),
+        ];
+    }
+
+    protected function getCacheFileName($file)
+    {
+        return $file->getFileID().'-'.$file->getFileVersionID().'.jpg';
+    }
+
+    protected function getCachePath($filename = null)
+    {
+        $path = DIR_BASE.'/application/files/cache/file_covers';
+
+        if ($filename) {
+            $path .= '/'.$filename;
+        }
+
+        return $path;
+    }
+
+    protected function getRelativeCachePath($filename = null)
+    {
+        $path = DIR_REL.'/application/files/cache/file_covers';
+        
+        if ($filename) {
+            $path .= '/'.$filename;
+        }
+
+        return $path;
     }
 
     /**
@@ -253,8 +300,10 @@ class Controller extends BlockController
         foreach ($files as $file) {
             // We only support PDFs at the moment, skip everything else.
             if ('application/pdf' === $file->getMimetype()) {
+                $cover = $this->getFileCover($file);
                 $covers[] = [
-                    'cover' => $this->getFileCover($file),
+                    'cover_exists' => $cover['cache_exists'],
+                    'cover' => $cover['relative_path'],
                     'version' => $file,
                 ];
             }
@@ -262,6 +311,24 @@ class Controller extends BlockController
 
         // We chunk the results into rows.
         return array_chunk($covers, $this->numPerRow);
+    }
+
+    public function __destruct()
+    {
+        ignore_user_abort(true);
+        flush();
+        ob_flush();
+
+        $cache_path = $this->getCachePath();
+
+        foreach ($this->getFileSetFiles() as $file) {
+            $file_name = $this->getCacheFileName($file);
+            $path = $this->getCachePath($file_name);
+
+            if (! file_exists($path)) {
+                file_put_contents($path, $this->generateFileCover($file));
+            }
+        }
     }
 
     /**
